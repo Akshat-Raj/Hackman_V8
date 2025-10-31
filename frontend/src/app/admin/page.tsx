@@ -239,10 +239,18 @@ export default function AdminPage() {
     const trimmed = inputToken.trim();
     if (!trimmed) return;
     localStorage.setItem('admin_token', trimmed);
+    // Also set a cookie so middleware can authorize nested /admin routes
+    try {
+      document.cookie = `admin_token=${encodeURIComponent(trimmed)}; Path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    } catch {}
     setToken(trimmed);
   }
   function handleLogout() {
     localStorage.removeItem('admin_token');
+    try {
+      // Clear the cookie
+      document.cookie = 'admin_token=; Path=/; Max-Age=0; SameSite=Lax';
+    } catch {}
     setToken("");
     setData(null);
   }
